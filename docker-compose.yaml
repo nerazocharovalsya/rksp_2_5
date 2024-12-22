@@ -1,0 +1,32 @@
+# Версия формата файла docker-compose
+version: "3.9"
+# Определение сервисов
+services:
+  # Первый сервис — приложение app1
+  app1:
+    # Путь к Dockerfile для сборки образа
+    build: .
+    # Политика перезапуска контейнера при сбое
+    restart: on-failure
+    # Переменные окружения, передаваемые в контейнер
+    environment:
+      - NAME_APP=app1
+    # Монтирование тома (локальной папки upload-files в контейнер)
+    volumes:
+      - ./upload-files:/upload-files
+    # Настройки развертывания
+    deploy:
+      # Режим развертывания (реплицированный режим)
+      mode: replicated
+      # Количество копий (реплик) этого сервиса
+      replicas: 4
+  # Второй сервис — прокси-сервер Nginx
+  proxy:
+    # Использование готового образа Nginx
+    image: nginx:latest
+    # Привязка порта хоста к порту контейнера
+    ports:
+      - '80:80'
+    # Монтирование конфигурации Nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
